@@ -27,3 +27,33 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# === INTELLIJ IDEA ===
+.idea/
+*.iml
+
+# === BUILD SYSTEM ===
+/out/
+/build/
+/target/
+
+# === JAVA ===
+*.class
+*.jar
+*.war
+*.ear
+
+# === LOGS Y TEMPORALES ===
+*.log
+*.tmp
+*.swp
+*.bak
+
+# === SISTEMA OPERATIVO ===
+.DS_Store
+Thumbs.db
+
+# === OTROS ===
+# Ignora configuraciones personales, por si las usas
+*.env
+.vscode/
