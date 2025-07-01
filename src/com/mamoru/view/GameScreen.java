@@ -63,6 +63,12 @@ public class GameScreen {
         Font pixelFont = Font.loadFont(getClass().getResourceAsStream("/fonts/pixel.ttf"), 16);
         Font smallFont = Font.loadFont(getClass().getResourceAsStream("/fonts/pixel.ttf"), 10);
 
+        status.wakeUpIfNeeded();
+        if (status.isSleeping() && !status.isReadyToWakeUp()) {
+            SleepOverlay.showSleepScreen(stage, status, main);
+            return;
+        }
+
         //formateo de la imagen del fondo
         BackgroundImage bgImage = new BackgroundImage(
                 new Image(getClass().getResource("/images/game_background.png").toExternalForm(), 700, 500, false, true),
@@ -97,9 +103,14 @@ public class GameScreen {
 //            main.showPlayScreen(stage, creatureName, creatureType, status);
 //        });
         sleepBtn.setOnAction(e -> {
-            status.sleep();
-            updateBars();
-            saveStatus();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want your Mamoru to sleep?\nIt'll regain it's energy in a real-time hour");
+            alert.showAndWait().ifPresent(response -> {
+                if (response.getText().equals("OK")) {
+                    status.sleep();
+                    saveStatus();
+                    SleepOverlay.showSleepScreen(stage, status, main);
+                }
+            });
         });
         cleanBtn.setOnAction(e -> {
             main.showCleanScreen(stage, creatureName, creatureType, status);

@@ -13,6 +13,8 @@ public class MamoruStatus implements Serializable { //hace de la clase un objeto
     private LocalDateTime sleepStart;
     private LocalDateTime lastUpdated;
 
+    private static final int sleepDurationMinutes = 60;
+
     //constructor
     public MamoruStatus() {
         this.hunger = 50;
@@ -57,20 +59,26 @@ public class MamoruStatus implements Serializable { //hace de la clase un objeto
 
     public boolean isReadyToWakeUp(){
         if (!sleeping || sleepStart == null) return false;
-        long minutesSlept = ChronoUnit.MINUTES.between(sleepStart, LocalDateTime.now());
-        return minutesSlept >=1;
-    }
-
-    public void wakeUp(){
-        if (sleeping && isReadyToWakeUp()){
-            energy = 100;
-            sleeping = false;
-            updateTime();
-        }
+        long elapsed = ChronoUnit.MINUTES.between(sleepStart, LocalDateTime.now());
+        return elapsed >= sleepDurationMinutes;
     }
 
     public boolean isSleeping(){
         return sleeping;
+    }
+
+    public long getMinutesLeftToWakeUp(){
+        if (!sleeping || sleepStart == null) return 0;
+        long elapsed = ChronoUnit.MINUTES.between(sleepStart, LocalDateTime.now());
+        return Math.max(0, sleepDurationMinutes - elapsed);
+    }
+
+    public void wakeUpIfNeeded(){
+        if (isReadyToWakeUp()){
+            sleeping = false;
+            energy = 100;
+            sleepStart = null;
+        }
     }
 
     //limpiar
