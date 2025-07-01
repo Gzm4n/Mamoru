@@ -1,7 +1,7 @@
 package com.mamoru;
 
-import com.mamoru.view.SelectCreatureMenu;
-import com.mamoru.view.StartMenu;
+import com.mamoru.model.MamoruStatus;
+import com.mamoru.view.*;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -23,6 +23,28 @@ public class Main extends Application { //clase de JavaFX
         SelectCreatureMenu creatureMenu = new SelectCreatureMenu(stage, this);
         creatureMenu.show();
     }
+
+    public void showFeedScreen(Stage stage, String creatureName, String creatureType, MamoruStatus status) {
+        FeedScreen feedScreen = new FeedScreen(stage, creatureName, creatureType, status, () -> {
+            // Acción al regresar (opcional)
+            showGameScreen(stage, creatureName, creatureType, status);
+        });
+        feedScreen.show();
+    }
+
+    public void showCleanScreen(Stage stage, String creatureName, String creatureType, MamoruStatus status) {
+        CleanScreen cleanScreen = new CleanScreen(stage, creatureName, creatureType, status, () -> {
+            // Acción al regresar (opcional)
+            showGameScreen(stage, creatureName, creatureType, status);
+        });
+        cleanScreen.show();
+    }
+
+    public void showGameScreen(Stage stage, String creatureName, String creatureType, MamoruStatus status) {
+        GameScreen gameScreen = new GameScreen(stage, creatureName, creatureType, status, this);
+        gameScreen.show();
+    }
+
 
     //ejecucion
     public static void main(String[] args) {

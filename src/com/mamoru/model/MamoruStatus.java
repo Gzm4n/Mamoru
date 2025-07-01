@@ -9,6 +9,8 @@ public class MamoruStatus implements Serializable { //hace de la clase un objeto
     private int hunger;
     private int energy;
     private int hygiene;
+    private boolean sleeping = false;
+    private LocalDateTime sleepStart;
     private LocalDateTime lastUpdated;
 
     //constructor
@@ -47,14 +49,38 @@ public class MamoruStatus implements Serializable { //hace de la clase un objeto
 
     //dormir
     public void sleep() {
-        energy = Math.min(100, energy + 15);
-        updateTime();
+        if (!sleeping){
+            sleeping = true;
+            sleepStart = LocalDateTime.now();
+        }
+    }
+
+    public boolean isReadyToWakeUp(){
+        if (!sleeping || sleepStart == null) return false;
+        long minutesSlept = ChronoUnit.MINUTES.between(sleepStart, LocalDateTime.now());
+        return minutesSlept >=1;
+    }
+
+    public void wakeUp(){
+        if (sleeping && isReadyToWakeUp()){
+            energy = 100;
+            sleeping = false;
+            updateTime();
+        }
+    }
+
+    public boolean isSleeping(){
+        return sleeping;
     }
 
     //limpiar
     public void clean() {
         hygiene = Math.min(100, hygiene + 20);
         updateTime();
+    }
+
+    public boolean isDead() {
+        return hunger <= 0 || energy <= 0 || hygiene <= 0;
     }
 
     //es el metodo que baja los valores segun el tiempo, con un maximo de 0

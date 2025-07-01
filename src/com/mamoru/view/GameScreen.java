@@ -4,7 +4,10 @@ import com.mamoru.Main;
 import com.mamoru.model.MamoruStatus;
 import com.mamoru.model.MamoruSaveData;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -88,24 +91,18 @@ public class GameScreen {
 
         //funcionamiento de botones setOnAction
         feedBtn.setOnAction(e -> {
-            status.feed(); //actualiza el valor del estado
-            updateBars(); //actualiza visualmente la barra
-            saveStatus(); //guarda el estado
+            main.showFeedScreen(stage, creatureName, creatureType, status);
         });
-        playBtn.setOnAction(e -> {
-            status.play();
-            updateBars();
-            saveStatus();
-        });
+//        playBtn.setOnAction(e -> {
+//            main.showPlayScreen(stage, creatureName, creatureType, status);
+//        });
         sleepBtn.setOnAction(e -> {
             status.sleep();
             updateBars();
             saveStatus();
         });
         cleanBtn.setOnAction(e -> {
-            status.clean();
-            updateBars();
-            saveStatus();
+            main.showCleanScreen(stage, creatureName, creatureType, status);
         });
 
         //caja horizontal de botones en la parte superior
@@ -188,6 +185,37 @@ public class GameScreen {
 
         //empieza a contar el tiempo para afectar al estado del mamoru
         startDecayTimer();
+
+
+        // movimiento espontaneo
+        Timeline movementTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(10), e -> {
+                    double imageWidth = creatureImage.getFitWidth();
+                    double minX = 20;
+                    double maxX = 500 - imageWidth - 20;
+
+                    double newX = minX + Math.random() * (maxX - minX);
+                    double actualX = creatureImage.getLayoutX() + creatureImage.getTranslateX();
+
+                    // Voltear hacia dirección real
+                    if (newX > actualX) {
+                        creatureImage.setScaleX(1);  // mirar a la derecha
+                    } else {
+                        creatureImage.setScaleX(-1); // mirar a la izquierda
+                    }
+
+                    // Movimiento usando translateX
+                    Timeline move = new Timeline(
+                            new KeyFrame(Duration.seconds(2),
+                                    new KeyValue(creatureImage.translateXProperty(), newX - creatureImage.getLayoutX())
+                            )
+                    );
+                    move.play();
+                })
+        );
+        movementTimeline.setCycleCount(Timeline.INDEFINITE);
+        movementTimeline.play();
+
     }
 
     //cargar un mamoru desde un archivo o usar caracteres default
@@ -276,21 +304,25 @@ public class GameScreen {
 
     //timer para bajar los valores de las barras segun el tiempo
     private void startDecayTimer() {
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> { //valores se actualizan cada 30 minutos
+        timeline = new Timeline(new KeyFrame(Duration.seconds(50), e -> { //valores se actualizan cada 30 minutos
             status.decay();
             updateBars();
             saveStatus();
 
             //logica en caso de que las barras lleguen a 0
-            if (status.getHunger() <= 0 || status.getEnergy() <= 0 || status.getHygiene() <= 0) {
+            if (status.isDead()) {
                 timeline.stop();
-                Alert alert = new Alert(Alert.AlertType.INFORMATION); //ventana de alerta
-                alert.setTitle("Mamoru ha muerto");
-                alert.setHeaderText("Lo siento");
-                alert.setContentText("Tu Mamoru ha muerto por descuido.");
-                alert.showAndWait();
-                stage.close();
+
+                Platform.runLater(() -> { //Se ejecuta después de que se ejecuta el timeline
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Mamoru ha muerto");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Tu Mamoru ha muerto... Intenta cuidarlo mejor la próxima vez.");
+                    alert.showAndWait();
+                    main.showStartMenu(stage);
+                });
             }
+
         }));
 
         //ciclos infinitos
