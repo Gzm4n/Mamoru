@@ -99,9 +99,11 @@ public class GameScreen {
         feedBtn.setOnAction(e -> {
             main.showFeedScreen(stage, creatureName, creatureType, status);
         });
-//        playBtn.setOnAction(e -> {
-//            main.showPlayScreen(stage, creatureName, creatureType, status);
-//        });
+        playBtn.setOnAction(e -> {
+            new PlayScreen(stage, status,() -> {
+                main.showGameScreen(stage, creatureName, creatureType, status);
+            }, creatureType);
+        });
         sleepBtn.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want your Mamoru to sleep?\nIt'll regain it's energy in a real-time hour");
             alert.showAndWait().ifPresent(response -> {

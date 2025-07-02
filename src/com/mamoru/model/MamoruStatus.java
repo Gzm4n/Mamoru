@@ -42,13 +42,6 @@ public class MamoruStatus implements Serializable { //hace de la clase un objeto
         updateTime();
     }
 
-    //lo mismo pero con jugar
-    public void play() {
-        energy = Math.max(0, energy - 10);
-        hygiene = Math.max(0, hygiene - 5);
-        updateTime();
-    }
-
     //dormir
     public void sleep() {
         if (!sleeping){
@@ -116,5 +109,9 @@ public class MamoruStatus implements Serializable { //hace de la clase un objeto
     //actualiza el tiempo
     private void updateTime() {
         lastUpdated = LocalDateTime.now();
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
     }
 }
